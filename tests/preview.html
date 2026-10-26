@@ -1,0 +1,10 @@
+<!doctype html><body style="margin:0;background:#333"><canvas id=c width=640 height=520></canvas>
+<script src="../data.js"></script><script src="../logic.js"></script><script src="../sprites.js"></script>
+<script>
+var c=document.getElementById('c'),g=c.getContext('2d');g.imageSmoothingEnabled=false;g.fillStyle='#6a8a6a';g.fillRect(0,0,640,520);
+EG.SPECIES_LIST.forEach(function(k,i){g.drawImage(EG.creatureSprite(k),(i%8)*80,Math.floor(i/8)*80,64,64);});
+var tiles='.=,"~#THRDWXFGPASM^EJcLNVUr'.split('');
+tiles.forEach(function(t,i){g.drawImage(EG.tileCanvas(t,0,i,i),(i%16)*40,170+Math.floor(i/16)*40,32,32);});
+var look={shirt:'#2a5fa8',hair:'#3a2a1a',skin:'#c68a5a',pants:'#6a5a3a',cap:'#d03a3a'};
+['down','up','left','right'].forEach(function(d,i){g.drawImage(EG.personSprite(look,d,0),i*80,260,64,64);g.drawImage(EG.personSprite(look,d,1),i*80+320,260,64,64);});
+</script>

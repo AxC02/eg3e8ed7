@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta name="robots" content="noindex, nofollow">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <title>Sandkeepers</title>
+  <meta name="theme-color" content="#14224f">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Sandkeepers">
+  <meta name="format-detection" content="telephone=no">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="styles.css?v=1">
+</head>
+<body>
+  <div id="app">
+    <div id="screen-wrap"><canvas id="screen" width="640" height="576"></canvas></div>
+    <div id="controls">
+      <div id="dpad" aria-label="Direction pad"><i class="bar h"></i><i class="bar v"></i><i class="ar u"></i><i class="ar d"></i><i class="ar l"></i><i class="ar r"></i></div>
+      <div id="mid"><button id="btn-start" type="button">MENU</button><button id="btn-snd" type="button">SOUND ON</button></div>
+      <div id="ab"><button id="btn-b" type="button">B</button><button id="btn-a" type="button">A</button></div>
+    </div>
+  </div>
+
+  <div id="backup" hidden>
+    <div class="panel">
+      <h2>Backup</h2>
+      <p id="bk-msg"></p>
+      <textarea id="bk-text" rows="6" spellcheck="false" autocapitalize="off" autocorrect="off"></textarea>
+      <div class="row"><button id="bk-copy" type="button">Copy</button><button id="bk-import" type="button">Import</button></div>
+      <div class="row"><button id="bk-reset" type="button" class="danger">Erase everything</button><button id="bk-close" type="button">Close</button></div>
+    </div>
+  </div>
+
+  <script src="data.js?v=1"></script>
+  <script src="logic.js?v=1"></script>
+  <script src="sprites.js?v=1"></script>
+  <script src="audio.js?v=1"></script>
+  <script src="game.js?v=1"></script>
+  <script>
+    if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+      window.addEventListener('load', function () { navigator.serviceWorker.register('service-worker.js').catch(function () {}); });
+    }
+  </script>
+</body>
+</html>

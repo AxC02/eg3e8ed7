@@ -1,0 +1,27 @@
+<!doctype html><html><head><meta charset="utf-8"></head><body>
+<div id="app"><div id="screen-wrap"><canvas id="screen"></canvas></div>
+<div id="dpad"></div><button id="btn-a"></button><button id="btn-b"></button><button id="btn-start"></button><button id="btn-snd"></button></div>
+<div id="backup" hidden><p id="bk-msg"></p><textarea id="bk-text"></textarea><button id="bk-copy"></button><button id="bk-import"></button><button id="bk-reset"></button><button id="bk-close"></button></div>
+<pre id="out">pending</pre>
+<script src="../data.js"></script><script src="../logic.js"></script><script src="../sprites.js"></script><script src="../audio.js"></script><script src="../game.js"></script>
+<script>
+(function(){
+var G=EG.game;
+async function main(){
+  localStorage.clear();
+  for(var i=0;i<400;i++){ G.press('a'); for(var k=0;k<4;k++){G.tick();await null;await null;} if(G.G.map&&G.G.mode==='world'&&G.getS()&&G.getS().team.length) break; }
+  var S=G.getS(); S.team=[EG.makeCreature('scarablaze',24),EG.makeCreature('duskhal',24)]; S.team.forEach(function(c){c.moves.sort(function(a,b){return (EG.MOVES[b].p||0)-(EG.MOVES[a].p||0);});}); S.flags.starter=true; S.flags.guard=1;
+  G.setRng(function(){return 0.5;});
+  while(G.G.locked||G.G.dialog||G.G.overlays.length){G.press('b');G.tick();await null;}
+  S.beaten=S.beaten||{}; 
+  G.loadMap('pyramid',10,4,'down');
+  
+  G.setHeld('down'); var f, tr=[], lastd=''; window.tr=tr; var tickO=G.tick;
+  for(f=0;f<20000&&!S.flags.boss;f++){ if(f%5===0) G.press('a'); G.tick(); await null; await null; if(window.__egError)break; if(f===30)G.setHeld(null); var d=G.G.dialog&&G.G.dialog.pages[G.G.dialog.pi].join(' '); if(d&&d!==lastd){lastd=d;tr.push(f+':'+d);}  }
+  for(var j=0;j<600;j++){ if(j%5===0)G.press('a'); G.tick(); await null; await null; }
+  G.render();
+  document.getElementById('out').textContent=(window.__egError?'ERROR '+window.__egError:'NOERR')+' frames='+f+' boss='+S.flags.boss+' team='+S.team.map(function(c){return c.sp+':'+c.lv+':'+c.hp}).join(',')+' gold='+S.gold+' mode='+G.G.mode+' dlg='+JSON.stringify(G.G.dialog&&G.G.dialog.pages[G.G.dialog.pi])+' menu='+JSON.stringify(G.G.bt&&G.G.bt.menu&&G.G.bt.menu.cells)+' B='+(G.G.bt?JSON.stringify({over:G.G.bt.B.over,sw:G.G.bt.B.needSwitch,pi:G.G.bt.B.pi,foes:G.G.bt.B.foes&&G.G.bt.B.foes.map(function(c){return c.sp+c.hp})}):'')+' TRACE='+tr.slice(0,40).join(' | ')+' ov='+G.G.overlays.length+' locked='+G.G.locked; var im=new Image(); im.src=document.getElementById('screen').toDataURL(); document.body.appendChild(im);
+}
+window.addEventListener('load',function(){setTimeout(function(){main().catch(function(e){document.getElementById('out').textContent='EXC '+(e.stack||e);});},50);});
+})();
+</script></body></html>

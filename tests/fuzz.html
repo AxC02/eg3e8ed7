@@ -1,0 +1,40 @@
+<!doctype html><html><head><meta charset="utf-8"><style>body{margin:0}#screen-wrap{width:640px;height:576px}</style></head><body>
+<div id="app"><div id="screen-wrap"><canvas id="screen"></canvas></div>
+<div id="dpad"></div><button id="btn-a"></button><button id="btn-b"></button><button id="btn-start"></button><button id="btn-snd"></button></div>
+<div id="backup" hidden><p id="bk-msg"></p><textarea id="bk-text"></textarea><button id="bk-copy"></button><button id="bk-import"></button><button id="bk-reset"></button><button id="bk-close"></button></div>
+<pre id="out">pending</pre>
+<script src="../data.js"></script><script src="../logic.js"></script><script src="../sprites.js"></script><script src="../audio.js"></script><script src="../game.js"></script>
+<script>
+(function(){
+var G=EG.game, seed=12345; function r(){ seed=(seed*1664525+1013904223)>>>0; return seed/4294967296; }
+G.setRng(r);
+var btns=['up','down','left','right','a','a','a','a','b','b','b','b','b','b','b','b','b','b','b','b','b','b','b','b','start'], dirs=[null,'up','down','left','right'];
+var stats={battles:0,maxlv:0,maps:{},frames:0,stuck:0};
+async function main(){
+  localStorage.clear();
+  for(var i=0;i<10;i++){G.tick();await null;}
+  // new game: mash through
+  for(var i=0;i<400;i++){ G.press('a'); for(var k=0;k<4;k++){G.tick();await null;await null;} if(G.G.map&&G.G.mode==='world'&&G.getS()&&G.getS().team.length) break; }
+  var S=G.getS(), idle=0, last=''; var seedArg=+(location.search.match(/seed=(\d+)/)||[0,12345])[1]; seed=seedArg; S.team.push(EG.makeCreature('jackling',15)); S.team.push(EG.makeCreature('scarabit',15)); S.team.push(EG.makeCreature('crocklet',15)); S.items.charm=99; S.items.ankh=99; S.items.tonic=50; S.gold=900;
+  for(var f=0;f<60000;f++){
+    if(f%15===0){ G.setHeld(dirs[Math.floor(r()*5)]); }
+    if(f%6===0){ G.press(btns[Math.floor(r()*btns.length)]); }
+    G.tick(); await null; await null;
+    S=G.getS();
+    if(G.G.mode==='battle') stats.battles++;
+    if(S&&S.team) S.team.forEach(function(c){ if(c.lv>stats.maxlv) stats.maxlv=c.lv; });
+    if(G.G.map) stats.maps[G.G.map.id]=1;
+    // keep progress interesting: periodic level boost & teleports
+    if(f%2500===2499 && S.team.length){ var spots={town:[13,12],route:[1,9],pyramid:[10,24],pyramid2:[10,24]}; spots.pyramid2=spots.pyramid; var ids=Object.keys(spots); var m=ids[Math.floor(r()*4)]; if(m==='pyramid2')m='pyramid'; S.flags.starter=true; if(G.G.locked||G.G.mode!=='world'||G.G.overlays.length||G.G.dialog){ for(var q=0;q<30;q++){G.press('b');G.tick();await null;} } try{ G.loadMap(m,spots[m][0],spots[m][1],'down'); }catch(e){ window.__egError='loadMap '+e; } S.team.forEach(function(c){ if(c.lv<12){} }); }
+    if(f%800===799 && S.team.length) S.team.forEach(function(c){ c.hp=EG.maxHp(c); });
+    if(window.__egError) break;
+    if(f%200===0) G.render();
+  }
+  G.render();
+  stats.flags=JSON.stringify(G.getS().flags); stats.dex=Object.keys(G.getS().dex.caught||{}).length; stats.team=G.getS().team.map(function(c){return c.sp+':'+c.lv});
+  stats.items=JSON.stringify(G.getS().items); stats.gold=G.getS().gold;
+  document.getElementById('out').textContent=(window.__egError?'ERROR '+window.__egError:'NOERR')+'\n'+JSON.stringify(stats);
+}
+window.addEventListener('load',function(){setTimeout(function(){main().catch(function(e){document.getElementById('out').textContent='EXC '+(e.stack||e)+JSON.stringify(stats);});},50);});
+})();
+</script></body></html>
